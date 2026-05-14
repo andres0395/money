@@ -14,9 +14,9 @@ const config = defineConfig({
     devtools(),
     nitro({ rollupConfig: { external: [/^@sentry\//] } }),
     tailwindcss(),
-    netlify(),
     tanstackStart(),
     viteReact(),
+    netlify(),
   ],
   ssr: {
     external: ['@prisma/client', '.prisma/client'],
