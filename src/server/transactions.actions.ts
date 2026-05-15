@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { createServerFn } from '@tanstack/react-start';
+import { getRequest } from '@tanstack/react-start/server';
 import { z } from 'zod';
 import { TransactionRepository } from '../repositories/transaction.repository.js';
 import { TransactionType } from '@prisma/client';
@@ -11,12 +11,10 @@ import {
 
 export const getTransactions = createServerFn({
   method: 'GET',
-}).handler(async ({ context }) => {
+}).handler(async () => {
   try {
-    if (!context) throw new Error('Internal Server Error: No context');
-    const request = (context as any).request as Request;
+    const request = getRequest();
     await requireAuth(request);
-
 
     const transactions = await TransactionRepository.findAll();
     return transactions;
@@ -28,12 +26,10 @@ export const getTransactions = createServerFn({
 
 export const getTransactionSummary = createServerFn({
   method: 'GET',
-}).handler(async ({ context }) => {
+}).handler(async () => {
   try {
-    if (!context) throw new Error('Internal Server Error: No context');
-    const request = (context as any).request as Request;
+    const request = getRequest();
     await requireAuth(request);
-
 
     const summary = await TransactionRepository.getSummary();
     return summary;
@@ -55,15 +51,13 @@ export const createTransaction = createServerFn({
       })
       .parse(data)
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     try {
-      if (!context) throw new Error('Internal Server Error: No context');
-      const request = (context as any).request as Request;
+      const request = getRequest();
+
       const ip = request.headers.get('x-forwarded-for') || 'anonymous';
-      checkRateLimit(ip, 5); // Max 5 creates per minute
+      checkRateLimit(ip, 5);
       await requireAdmin(request);
-
-
 
       const transaction = await TransactionRepository.create(data);
       return transaction;
@@ -83,10 +77,10 @@ export const deleteTransaction = createServerFn({
       })
       .parse(data)
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     try {
-      if (!context) throw new Error('Internal Server Error: No context');
-      const request = (context as any).request as Request;
+      const request = getRequest();
+
       const ip = request.headers.get('x-forwarded-for') || 'anonymous';
       checkRateLimit(ip, 5);
       await requireAdmin(request);
@@ -101,12 +95,12 @@ export const deleteTransaction = createServerFn({
 
 export const consolidateMonth = createServerFn({
   method: 'POST',
-}).handler(async ({ context }) => {
+}).handler(async () => {
   try {
-    if (!context) throw new Error('Internal Server Error: No context');
-    const request = (context as any).request as Request;
+    const request = getRequest();
+
     const ip = request.headers.get('x-forwarded-for') || 'anonymous';
-    checkRateLimit(ip, 2); // Max 2 consolidations per minute
+    checkRateLimit(ip, 2);
     await requireAdmin(request);
 
     const count = await TransactionRepository.consolidateMonth();
@@ -119,12 +113,10 @@ export const consolidateMonth = createServerFn({
 
 export const getConsolidatedTransactions = createServerFn({
   method: 'GET',
-}).handler(async ({ context }) => {
+}).handler(async () => {
   try {
-    if (!context) throw new Error('Internal Server Error: No context');
-    const request = (context as any).request as Request;
+    const request = getRequest();
     await requireAuth(request);
-
 
     const transactions = await TransactionRepository.getConsolidatedSummary();
     return transactions;
@@ -133,4 +125,3 @@ export const getConsolidatedTransactions = createServerFn({
     throw error;
   }
 });
-

@@ -1,17 +1,13 @@
 import { auth } from './auth.js';
+import { getRequest } from '@tanstack/react-start/server';
 
 export async function getSession(request?: Request) {
-  if (!request) {
-    return null;
-  }
+  const req = request || getRequest()
 
   return await auth.api.getSession({
-    headers: request.headers,
+    headers: req.headers,
   });
 }
-
-
-
 
 export async function requireAdmin(request?: Request) {
   const session = await getSession(request);
@@ -29,10 +25,9 @@ export async function requireAuth(request?: Request) {
   return session;
 }
 
-
 /**
- * Simple in-memory rate limiter.
- * In a real production environment, use Redis (Upstash) for persistence across instances.
+ * NOTA: En Netlify (Serverless), este Map se borrará constantemente entre peticiones.
+ * Considera migrar esto a Upstash/Redis en el futuro.
  */
 const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
 
