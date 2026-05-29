@@ -1,5 +1,5 @@
 import { authClient } from "../../lib/auth-client.js"
-import { LogOut, User } from "lucide-react"
+import { LogOut } from "lucide-react"
 
 export default function BetterAuthHeader() {
   const { data: session, isPending } = authClient.useSession()
@@ -14,26 +14,19 @@ export default function BetterAuthHeader() {
     return (
       <div className="flex items-center gap-4">
         <div className="hidden md:flex flex-col items-end">
-          <span className="text-xs font-bold text-[var(--text-main)] leading-none">{session.user.name}</span>
-          <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider">
+          <span className="text-xs font-bold text-(--text-main) leading-none">{session.user.name}</span>
+          <span className="text-[10px] font-medium text-(--text-muted) uppercase tracking-wider">
             {(session.user as any).role || 'VIEWER'}
           </span>
         </div>
         
-        <div className="flex items-center gap-2 island-shell p-1.5 rounded-full border-[var(--border-glass)]">
-          <div className="h-8 w-8 rounded-full bg-[var(--primary)]/20 flex items-center justify-center text-[var(--primary)] border border-[var(--primary)]/30">
-            {session.user.image ? (
-              <img src={session.user.image} alt="" className="h-full w-full rounded-full object-cover" />
-            ) : (
-              <User size={16} />
-            )}
-          </div>
-          
+        <div className="flex items-center gap-2 island-shell p-1.5 rounded-full border-(--border-glass)">
+
           <button
             onClick={() => {
               void authClient.signOut()
             }}
-            className="p-1.5 hover:text-[var(--danger)] transition-colors text-[var(--text-muted)]"
+            className="p-1.5 hover:text-(--danger) transition-colors text-(--text-muted)"
             title="Cerrar sesión"
             style={{ background: 'none', border: 'none' }}
           >
